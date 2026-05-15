@@ -150,6 +150,7 @@ def search_knowledge_base(query: str, top_k: int = 5) -> str:
         top_k: 返回结果数量，默认 5
     """
     if MCP_MODE == "http":
+        # HTTP 模式没有独立的 retrieve 端点，用 qa 接口获取 sources
         result = _http_post("/api/v1/qa/", json_data={
             "question": query,
             "top_k": top_k,
@@ -157,16 +158,16 @@ def search_knowledge_base(query: str, top_k: int = 5) -> str:
         })
         if "error" in result:
             return f"搜索失败: {result['error']}"
-        answer = result.get("answer", "未找到相关信息")
         sources = result.get("sources", [])
-        output = f"## 搜索结果\n{answer}\n"
-        if sources:
-            output += "\n## 参考来源\n"
-            for i, src in enumerate(sources, 1):
-                name = src.get("document_name", "未知文件")
-                score = src.get("score", 0)
-                output += f"[{i}] {name} (相关度: {score:.2f})\n"
-        return output
+        if not sources:
+            return "未找到相关信息"
+        formatted = []
+        for i, src in enumerate(sources, 1):
+            name = src.get("document_name", "未知文件")
+            score = src.get("score", 0)
+            content = src.get("content", "")[:300]
+            formatted.append(f"[{i}] 文件: {name} | 相关度: {score:.2f}\n{content}\n")
+        return "\n".join(formatted)
 
     # 本地模式
     try:
