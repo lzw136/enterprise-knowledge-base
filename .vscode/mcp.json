@@ -6,9 +6,6 @@
       "args": ["mcp_server.py"],
       "cwd": "${workspaceFolder}",
       "env": {
-        "OPENAI_API_KEY": "sk-e8098ac600274cc196d5eb62a256b17e",
-        "OPENAI_API_BASE": "https://api.deepseek.com/v1",
-        "OPENAI_MODEL": "deepseek-chat",
         "MCP_MODE": "local"
       }
     }
